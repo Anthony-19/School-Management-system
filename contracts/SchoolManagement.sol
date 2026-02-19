@@ -78,16 +78,17 @@ contract SchoolManagement {
             "Insufficient token balance"
         );
 
-        require(
-            token.allowance(msg.sender, address(this)) >= _amount,
-            "Not enough allowance"
-        );
+        // require(
+        //     token.allowance(msg.sender, address(this)) >= _amount,
+        //     "Not enough allowance"
+        // );
 
-        require(_amount > 0, "There is no amount");
+        // require(_amount > 0, "There is no amount");
 
-        bool success = token.transferFrom(msg.sender, address(this), _amount);
+        // bool success = 
+        token.transferFrom(msg.sender, address(this), _amount);
 
-        require(success, "Token transfer failed");
+        // require(success, "Token transfer failed");
 
         studentTimePaid = block.timestamp;
     }
@@ -120,6 +121,7 @@ contract SchoolManagement {
         require(success, "Token transfer failed");
         lecturerTimePaid = block.timestamp;
     }
+    
 
     function registerStaff(string memory _name, uint _grade) public {
         require(bytes(_name).length > 0, "Name required");
