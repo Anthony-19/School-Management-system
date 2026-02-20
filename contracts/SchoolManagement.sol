@@ -29,6 +29,8 @@ contract SchoolManagement {
     IERC20 public token;
 
     mapping(uint => uint) public lecturerSalary;
+    mapping(address => uint) public ownerPaid;
+    mapping(address => uint) public teacherIdentity;
 
     constructor(address _token) {
         token = IERC20(_token);
@@ -43,13 +45,16 @@ contract SchoolManagement {
         string name;
         uint grade;
         uint timePaid;
+        bool isPaid;
     }
     struct Lecturer {
         uint id;
         string name;
+        uint grade;
         uint timePaid;
         uint salary;
         bool isPaid;
+        address account;
     }
 
     Student[] public students;
@@ -61,7 +66,7 @@ contract SchoolManagement {
     uint studentTimePaid;
     uint lecturerTimePaid;
 
-    function payfeeOnRegistration(uint _grade) public {
+    function payfeeOnRegistration(uint _grade, string memory _name) public {
         uint _amount;
         if (_grade == 400) _amount = 400 * (10 ** 18);
         else if (_grade == 300) _amount = 300 * (10 ** 18);
@@ -73,32 +78,12 @@ contract SchoolManagement {
             "Invalid grade"
         );
 
-        require(
-            token.balanceOf(msg.sender) >= _amount,
-            "Insufficient token balance"
-        );
+        require(msg.sender != address(0), "This address doesnt exist");
 
-        // require(
-        //     token.allowance(msg.sender, address(this)) >= _amount,
-        //     "Not enough allowance"
-        // );
-
-        // require(_amount > 0, "There is no amount");
-
-        // bool success = 
         token.transferFrom(msg.sender, address(this), _amount);
 
-        // require(success, "Token transfer failed");
-
         studentTimePaid = block.timestamp;
-    }
 
-    function registerSudent(string memory _name, uint _grade) public {
-        require(bytes(_name).length > 0, "Name required");
-        require(
-            _grade == 100 || _grade == 200 || _grade == 300 || _grade == 400,
-            "Invalid grade"
-        );
         require(studentTimePaid > 0, "Pay fee first");
 
         studentId += 1;
@@ -106,42 +91,57 @@ contract SchoolManagement {
             studentId,
             _name,
             _grade,
-            studentTimePaid
+            studentTimePaid,
+            true
         );
         students.push(student);
 
         studentTimePaid = 0;
     }
-
-    function payfeeOnLecturer(uint _grade) public {
-        uint _salary = lecturerSalary[_grade];
-        require(_salary > 0, "Invalid grade");
-        bool success = token.transfer(msg.sender, lecturerSalary[_grade]);
-
-        require(success, "Token transfer failed");
-        lecturerTimePaid = block.timestamp;
-    }
     
-
-    function registerStaff(string memory _name, uint _grade) public {
-        require(bytes(_name).length > 0, "Name required");
-
-        uint _salary = lecturerSalary[_grade];
-        require(_salary > 0, "Invalid grade");
-        require(lecturerTimePaid > 0, "Salary not paid yet");
+    function registerStaff(uint _grade, string memory _name, address _account) public {
+        require(
+            _grade == 100 || _grade == 200 || _grade == 300 || _grade == 400,
+            "Invalid grade"
+        );
+      
 
         teacherId += 1;
 
         Lecturer memory lecturer = Lecturer(
             teacherId,
             _name,
-            _salary,
-            lecturerTimePaid,
-            true
+            _grade,
+            0, 
+            0,
+            false, 
+            _account
         );
         lecturers.push(lecturer);
-        lecturerTimePaid = 0;
     }
+
+    function payfeeOnLecturer(address _address) public {
+        uint _grades = ownerPaid[_address];
+        uint _teacherIdentity = teacherIdentity[_address];
+        uint salary = lecturerSalary[_grades];
+
+        require(salary > 0, "Invalid grade");
+
+        bool success = token.transfer(_address, salary);
+        lecturerTimePaid = block.timestamp;
+        Lecturer storage lecturer = lecturers[_teacherIdentity - 1];
+
+        lecturer.timePaid = lecturerTimePaid;
+        lecturer.salary = salary;
+        lecturer.isPaid = true;
+
+        lecturerTimePaid = 0;
+
+        require(success, "Token transfer failed");
+    
+    }
+    
+
 
     function getAllStudent() public view returns (Student[] memory) {
         return students;
