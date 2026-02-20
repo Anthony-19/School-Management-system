@@ -29,7 +29,7 @@ contract SchoolManagement {
     IERC20 public token;
 
     mapping(uint => uint) public lecturerSalary;
-    mapping(address => uint) public ownerPaid;
+    mapping(address => uint) public gradeUsedForPayment;
     mapping(address => uint) public teacherIdentity;
 
     constructor(address _token) {
@@ -120,22 +120,21 @@ contract SchoolManagement {
         lecturers.push(lecturer);
     }
 
-    function payfeeOnLecturer(address _address) public {
-        uint _grades = ownerPaid[_address];
-        uint _teacherIdentity = teacherIdentity[_address];
-        uint salary = lecturerSalary[_grades];
+    function payfeeOnLecturer(uint _id,address _address) public {
+        require(_id >= 1 && _id <= lecturers.length, "Invalid lecturer ID");
+        require(lecturers[_id - 1].account == _address, "Invalid lecturer address");
 
-        require(salary > 0, "Invalid grade");
-
-        bool success = token.transfer(_address, salary);
+        Lecturer storage _lecturer = lecturers[_id - 1];
+        
         lecturerTimePaid = block.timestamp;
-        Lecturer storage lecturer = lecturers[_teacherIdentity - 1];
+        uint salary = lecturerSalary[_lecturer.grade];
 
-        lecturer.timePaid = lecturerTimePaid;
-        lecturer.salary = salary;
-        lecturer.isPaid = true;
-
-        lecturerTimePaid = 0;
+        require(!_lecturer.isPaid, "Already paid");
+        _lecturer.timePaid = lecturerTimePaid;
+        _lecturer.salary = salary;
+        _lecturer.isPaid = true;
+        _address =  _lecturer.account;
+        bool success = token.transfer(_address, salary);
 
         require(success, "Token transfer failed");
     
