@@ -1,13 +1,7 @@
-# Sample Hardhat Project
+SaveEther Contract Address: 0xF947a2C4DC5a37172250cbB668E9ad3A4e5F12f9
 
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, and a Hardhat Ignition module that deploys that contract.
+TODO Contract Address: 0x212dBC6cE5511bE1493EaDe4B5F90e46Ef585b35
 
-Try running some of the following tasks:
+ERC20 Contract Address: 0xe1498B146B50F7095878BAFc0A0dc8dc29941543
 
-```shell
-npx hardhat help
-npx hardhat test
-REPORT_GAS=true npx hardhat test
-npx hardhat node
-npx hardhat ignition deploy ./ignition/modules/Lock.ts
-```
+SchoolManagement Contract Address: 0x97720d48211acB87E4d3e709A44B0a98eA6b447A
