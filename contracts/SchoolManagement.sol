@@ -163,7 +163,7 @@ contract SchoolManagement {
     }
 
     function suspendLecturer(uint _id) public{
-         require(_id >= 1 && _id <= students.length, "Invalid student ID");
+         require(_id >= 1 && _id <= lecturers.length, "Invalid student ID");
          Lecturer storage _lecturer = lecturers[_id - 1];
          _lecturer.status = StaffStatus.Suspended;
     }
