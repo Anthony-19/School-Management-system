@@ -31,6 +31,7 @@ contract SchoolManagement {
     mapping(uint => uint) public lecturerSalary;
     mapping(address => uint) public gradeUsedForPayment;
     mapping(address => uint) public teacherIdentity;
+    mapping(address => uint) public teacherName;
 
     constructor(address _token) {
         token = IERC20(_token);
@@ -47,6 +48,12 @@ contract SchoolManagement {
         uint timePaid;
         bool isPaid;
     }
+
+     enum StaffStatus{
+            Active,
+            Suspended
+        }
+
     struct Lecturer {
         uint id;
         string name;
@@ -55,6 +62,8 @@ contract SchoolManagement {
         uint salary;
         bool isPaid;
         address account;
+        StaffStatus status;
+       
     }
 
     Student[] public students;
@@ -115,9 +124,11 @@ contract SchoolManagement {
             0, 
             0,
             false, 
-            _account
+            _account,
+            StaffStatus.Active
         );
         lecturers.push(lecturer);
+        teacherName[_account] = _grade;
     }
 
     function payfeeOnLecturer(uint _id,address _address) public {
@@ -136,13 +147,36 @@ contract SchoolManagement {
         _address =  _lecturer.account;
 
         token.transfer(_address, salary);
-        // bool success = token.transfer(_address, salary);
+
+        // teacher
+        // bool success = 
 
         // require(success, "Token transfer failed");
     
     }
     
+    function removeStudent(uint _id) public {
+        require(_id >= 1 && _id <= students.length, "Invalid student ID");
+        // students[_id - 1] = students[students.length -1];
+        Student storage student = students[_id - 1];
+        Student storage lastStudent = students[students.length - 1];
+        student =  lastStudent;
+        students.pop();
+    }
 
+    function suspendLecturer(uint _id) public{
+         require(_id >= 1 && _id <= students.length, "Invalid student ID");
+         Lecturer storage _lecturer = lecturers[_id - 1];
+         _lecturer.status = StaffStatus.Suspended;
+    }
+
+    function getAllSuspendedLecturer() view public returns(Lecturer memory){
+        for(uint i = 0; i < lecturers.length - 1; i++){
+            if(lecturers[i].status == StaffStatus.Suspended){
+               return lecturers[i];
+            }
+        }
+    }
 
     function getAllStudent() public view returns (Student[] memory) {
         return students;
