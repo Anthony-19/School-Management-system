@@ -134,9 +134,11 @@ contract SchoolManagement {
         _lecturer.salary = salary;
         _lecturer.isPaid = true;
         _address =  _lecturer.account;
-        bool success = token.transfer(_address, salary);
 
-        require(success, "Token transfer failed");
+        token.transfer(_address, salary);
+        // bool success = token.transfer(_address, salary);
+
+        // require(success, "Token transfer failed");
     
     }
     
