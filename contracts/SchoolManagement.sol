@@ -157,10 +157,8 @@ contract SchoolManagement {
     
     function removeStudent(uint _id) public {
         require(_id >= 1 && _id <= students.length, "Invalid student ID");
-        // students[_id - 1] = students[students.length -1];
-        Student storage student = students[_id - 1];
-        Student storage lastStudent = students[students.length - 1];
-        student =  lastStudent;
+        uint _index = _id - 1;
+        students[_index] = students[students.length - 1];
         students.pop();
     }
 
@@ -170,13 +168,13 @@ contract SchoolManagement {
          _lecturer.status = StaffStatus.Suspended;
     }
 
-    function getAllSuspendedLecturer() view public returns(Lecturer memory){
-        for(uint i = 0; i < lecturers.length - 1; i++){
-            if(lecturers[i].status == StaffStatus.Suspended){
-               return lecturers[i];
-            }
-        }
-    }
+    // function getAllSuspendedLecturer() view public returns(Lecturer[] memory){
+    //     for(uint i = 0; i < lecturers.length - 1; i++){
+    //         if(lecturers[i].status == StaffStatus.Suspended){
+    //            return lecturers[i];
+    //         }
+    //     }
+    // }
 
     function getAllStudent() public view returns (Student[] memory) {
         return students;
